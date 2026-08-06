@@ -20,7 +20,10 @@ export const getBlogById = async (id: number) => {
 }
 
 export const likeBlogById = async (id: number) => {
+  const blog = await db.query.blogs.findFirst({ where: eq(blogs.id, id) })
+  if (!blog) return false
   await db.update(blogs).set({ likes: sql`${blogs.likes} + 1` }).where(eq(blogs.id, id))
+  return true
 }
 
 export const getBlogsByLikesDesc = async () => {
