@@ -9,10 +9,9 @@ const Blogs = async ({
   const { popular, filter } = await searchParams
   const showPopular = popular === "true"
   const searchTerm = filter ?? ""
-
-  const blogs = (showPopular ? getBlogsByLikesDesc() : getBlogs()).filter(
-    (blog) =>
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const allBlogs = await getBlogs(showPopular)
+  const blogs = allBlogs.filter((blog) =>
+    blog.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
