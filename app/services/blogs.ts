@@ -1,56 +1,31 @@
-const blogs = [
-  {
-    id: 1,
-    title: "next.js utilizes React Server Components",
-    author: "Author 1",
-    url: "https://nextjs.org",
-    likes: 7,
-  },
-  {
-    id: 2,
-    title: "next.js is built on top of React",
-    author: "Author 2",
-    url: "https://react.dev",
-    likes: 12,
-  },
-  {
-    id: 3,
-    title: "next.js supports both static and dynamic rendering",
-    author: "Author 2",
-    url: "https://nextjs.org/docs",
-    likes: 5,
-  },
-]
+import { eq, desc, sql } from "drizzle-orm"
+import { db } from "../../db"
+import { blogs } from "../../db/schema"
 
-let nextId = 4
-
-export const getBlogs = () => {
-  return blogs
-}
-
-export const addBlog = (
-  title: string,
-  author: string,
-  url: string,
-  likes: number = 0
-) => {
-  blogs.push({ id: nextId++, title, author, url, likes })
-}
-
-export const getBlogById = (id: number) => {
-  return blogs.find((blog) => blog.id === id)
-}
-
-export const likeBlogById = (id: number) => {
-  const blog = blogs.find((b) => b.id === id)
-  if (!blog) {
-    return false
+export const getBlogs = async (popularOnly: boolean) => {
+  if (popularOnly) {
+    return await db.query.blogs.findMany({
+      orderBy: desc(blogs.likes),
+    })
   }
+  return await db.query.blogs.findMany()
+}
 
-  blog.likes += 1
+export const addBlog = async (title: string, author: string, url: string, likes = 0) => {
+  await db.insert(blogs).values({ title, author, url, likes })
+}
+
+export const getBlogById = async (id: number) => {
+  return await db.query.blogs.findFirst({ where: eq(blogs.id, id), })
+}
+
+export const likeBlogById = async (id: number) => {
+  const blog = await db.query.blogs.findFirst({ where: eq(blogs.id, id) })
+  if (!blog) return false
+  await db.update(blogs).set({ likes: sql`${blogs.likes} + 1` }).where(eq(blogs.id, id))
   return true
 }
 
-export const getBlogsByLikesDesc = () => {
-  return [...blogs].sort((a, b) => b.likes - a.likes)
+export const getBlogsByLikesDesc = async () => {
+  return await db.query.blogs.findMany({ orderBy: desc(blogs.likes) })
 }

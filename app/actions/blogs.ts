@@ -9,7 +9,7 @@ export const createBlog = async (formData: FormData) => {
   const author = (formData.get("author") as string).trim()
   const url = (formData.get("url") as string).trim()
 
-  addBlog(title, author, url) // likes defaults to 0 in your service
+  await addBlog(title, author, url) // likes defaults to 0 in your service
   
   revalidatePath("/blogs")
   redirect("/blogs")
@@ -21,7 +21,7 @@ export const likeBlog = async (formData: FormData) => {
     return
   }
 
-  const updated = likeBlogById(id)
+  const updated = await likeBlogById(id)
   if (!updated) {
     return
   }
