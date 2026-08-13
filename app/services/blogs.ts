@@ -12,7 +12,13 @@ export const getBlogs = async (popularOnly: boolean) => {
 }
 
 export const addBlog = async (title: string, author: string, url: string, likes = 0) => {
-  await db.insert(blogs).values({ title, author, url, likes })
+  const user = await db.query.users.findFirst({
+    orderBy: sql`RANDOM()`,
+  })
+  if (!user) {
+    throw new Error("No users found in the database to assign this note to.")
+  }
+  await db.insert(blogs).values({ title, author, url, likes, userId: user.id })
 }
 
 export const getBlogById = async (id: number) => {
