@@ -1,6 +1,7 @@
 import { eq, desc, sql } from "drizzle-orm"
 import { db } from "../../db"
 import { blogs } from "../../db/schema"
+import { getCurrentUser } from "./session"
 
 export const getBlogs = async (popularOnly: boolean) => {
   if (popularOnly) {
@@ -12,9 +13,7 @@ export const getBlogs = async (popularOnly: boolean) => {
 }
 
 export const addBlog = async (title: string, author: string, url: string, likes = 0) => {
-  const user = await db.query.users.findFirst({
-    orderBy: sql`RANDOM()`,
-  })
+  const user = await getCurrentUser()
   if (!user) {
     throw new Error("No users found in the database to assign this note to.")
   }
