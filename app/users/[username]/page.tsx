@@ -3,9 +3,8 @@ import { notFound } from "next/navigation"
 import { getUserByUsername } from "../../services/users"
 
 const UserPage = async ({ params }: { params: Promise<{ username: string }> }) => {
-  const { username } = await params // 👈 destructure username string
+  const { username } = await params
   
-  // No need to wrap with Number() anymore since username is already a string
   const user = await getUserByUsername(username)
 
   if (!user) {
