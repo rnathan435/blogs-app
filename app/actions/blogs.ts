@@ -2,52 +2,68 @@
 
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-import { addBlog, likeBlogById } from "../services/blogs"
+import { addBlog, likeBlogById } from "../services/blogs" // Ensure likeBlogById is imported
 import { auth } from "@/auth";
 
 export type ActionState = {
-  error?: string
+  errors?: {
+    title?: string;
+    author?: string;
+    url?: string;
+  };
+  values?: {
+    title: string;
+    author: string;
+    url: string;
+  };
 }
 
+// 1. Your createBlog action (keeps your validation logic)
 export const createBlog = async (prevState: ActionState, formData: FormData) => {
   const session = await auth()
   if (!session) {
     redirect("/login")
   }
-  const title = (formData.get("title") as string).trim()
-  const author = (formData.get("author") as string).trim()
-  const url = (formData.get("url") as string).trim()
 
-  if (!title || title.length < 5) {
-    return { error: "Title must be at least 5 characters long" }
+  const title = (formData.get("title") as string) || ""
+  const author = (formData.get("author") as string) || ""
+  const url = (formData.get("url") as string) || ""
+
+  const errors: NonNullable<ActionState["errors"]> = {}
+
+  if (title.trim().length < 5) {
+    errors.title = "Title must be at least 5 characters long"
+  }
+  if (author.trim().length < 5) {
+    errors.author = "Author must be at least 5 characters long"
+  }
+  if (url.trim().length < 5) {
+    errors.url = "URL must be at least 5 characters long"
   }
 
-  if (!author || author.length < 5) {
-    return { error: "Author must be at least 5 characters long" }
+  if (Object.keys(errors).length > 0) {
+    return { 
+      errors, 
+      values: { title, author, url } 
+    }
   }
 
-  if (!url || url.length < 5) {
-    return { error: "URL must be at least 5 characters long" }
-  }
-
-
-  await addBlog(title, author, url) // likes defaults to 0 in your service
+  await addBlog(title.trim(), author.trim(), url.trim())
   
   revalidatePath("/blogs")
   redirect("/blogs")
 }
 
+// 2. Add the missing likeBlog action back here
 export const likeBlog = async (formData: FormData) => {
   const id = Number(formData.get("id"))
   if (!Number.isFinite(id)) {
     return
   }
-
   const updated = await likeBlogById(id)
   if (!updated) {
     return
   }
-
   revalidatePath("/blogs")
   revalidatePath(`/blogs/${id}`)
 }
