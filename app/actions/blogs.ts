@@ -2,10 +2,9 @@
 
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-import { addBlog } from "../services/blogs"
+import { addBlog, likeBlogById } from "../services/blogs" // Ensure likeBlogById is imported
 import { auth } from "@/auth";
 
-// 1. Update the type to hold field errors and values
 export type ActionState = {
   errors?: {
     title?: string;
@@ -19,6 +18,7 @@ export type ActionState = {
   };
 }
 
+// 1. Your createBlog action (keeps your validation logic)
 export const createBlog = async (prevState: ActionState, formData: FormData) => {
   const session = await auth()
   if (!session) {
@@ -29,7 +29,6 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
   const author = (formData.get("author") as string) || ""
   const url = (formData.get("url") as string) || ""
 
-  // 2. Collect errors into an object
   const errors: NonNullable<ActionState["errors"]> = {}
 
   if (title.trim().length < 5) {
@@ -42,7 +41,6 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
     errors.url = "URL must be at least 5 characters long"
   }
 
-  // 3. If there are errors, return them along with the original values
   if (Object.keys(errors).length > 0) {
     return { 
       errors, 
@@ -54,4 +52,18 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
   
   revalidatePath("/blogs")
   redirect("/blogs")
+}
+
+// 2. Add the missing likeBlog action back here
+export const likeBlog = async (formData: FormData) => {
+  const id = Number(formData.get("id"))
+  if (!Number.isFinite(id)) {
+    return
+  }
+  const updated = await likeBlogById(id)
+  if (!updated) {
+    return
+  }
+  revalidatePath("/blogs")
+  revalidatePath(`/blogs/${id}`)
 }
