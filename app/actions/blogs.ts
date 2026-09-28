@@ -16,6 +16,7 @@ export type ActionState = {
     author: string;
     url: string;
   };
+  success?: boolean;
 }
 
 // 1. Your createBlog action (keeps your validation logic)
@@ -44,14 +45,15 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
   if (Object.keys(errors).length > 0) {
     return { 
       errors, 
-      values: { title, author, url } 
+      values: { title, author, url },
+      success: false
     }
   }
 
   await addBlog(title.trim(), author.trim(), url.trim())
   
   revalidatePath("/blogs")
-  redirect("/blogs")
+  return { error: "", success: true }
 }
 
 // 2. Add the missing likeBlog action back here
