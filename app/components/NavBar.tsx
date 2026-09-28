@@ -1,33 +1,38 @@
 "use client"
-import Link from "next/link"
+
 import { useSession, signOut } from "next-auth/react"
+import NavLink from "./NavLink"
 
 export default function NavBar() {
   const { data: session } = useSession()
 
   return (
-    <nav>
-      <Link href="/">Home</Link>
-      {" | "} 
-      <Link href="/blogs">Blogs</Link>
-      {" | "} 
-      <Link href="/users">Users</Link>
-      {" | "} 
-      {session ? (
-        <>
-          <Link href="/blogs/new">New Blog</Link>
-          {" | "}
-          <em>{session.user?.name} logged in</em>{" "}
-          <button onClick={() => signOut()}>logout</button>
-        </>
-      ) : (
-        /* ✨ Fixed: Added empty tags <> and </> to group these elements together */
-        <>
-          <Link href="/login">Login</Link>
-          {" | "}
-          <Link href="/register">register</Link>
-        </>
-      )}
+    <nav className="bg-gray-800 text-white px-6 py-3 flex items-center gap-4">
+      {/* 1. Use the new NavLink abstraction for primary routes */}
+      <NavLink href="/">home</NavLink>
+      <NavLink href="/blogs">blogs</NavLink>
+      <NavLink href="/users">users</NavLink>
+      
+      {/* 2. Flex-container pushes profile/auth elements cleanly to the right side */}
+      <div className="ml-auto flex items-center gap-4">
+        {session ? (
+          <>
+            <NavLink href="/blogs/new">create new</NavLink>
+            <em className="text-gray-300 text-sm italic">{session.user?.name} logged in</em>
+            <button
+              onClick={() => signOut()}
+              className="bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded text-sm transition"
+            >
+              logout
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink href="/login">login</NavLink>
+            <NavLink href="/register">register</NavLink>
+          </>
+        )}
+      </div>
     </nav>
   )
 }
