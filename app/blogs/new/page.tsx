@@ -13,14 +13,12 @@ const NewBlog = () => {
 
   useEffect(() => {
     if (state.success) {
-      // ✨ Fixed: Updated message and path to reference blogs instead of notes
       showNotification("blog created")
       router.push("/blogs")
     }
   }, [state, showNotification, router])
 
   return (
-    // Card Container Layout
     <div className="max-w-md mx-auto mt-10 p-6 bg-white border rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Create a new blog</h2>
       
