@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-import { addBlog, likeBlogById } from "../services/blogs" // Ensure likeBlogById is imported
+import { addBlog, likeBlogById } from "../services/blogs"
 import { auth } from "@/auth";
 
 export type ActionState = {
@@ -19,7 +19,6 @@ export type ActionState = {
   success?: boolean;
 }
 
-// 1. Your createBlog action (keeps your validation logic)
 export const createBlog = async (prevState: ActionState, formData: FormData) => {
   const session = await auth()
   if (!session) {
@@ -56,7 +55,6 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
   return { error: "", success: true }
 }
 
-// 2. Add the missing likeBlog action back here
 export const likeBlog = async (formData: FormData) => {
   const id = Number(formData.get("id"))
   if (!Number.isFinite(id)) {

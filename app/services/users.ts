@@ -21,7 +21,7 @@ export const getBlogsByUserId = async (userId: number) => {
 
 export const getUserByUsername = async (username: string) => {
   return db.query.users.findFirst({
-    where: eq(users.username, username), // 👈 Filtering by username now
+    where: eq(users.username, username),
     with: {
       blogs: true, 
     },
