@@ -4,6 +4,7 @@ import { getBlogById } from "../../services/blogs"
 import { likeBlog } from "../../actions/blogs"
 import { getCurrentUser } from "../../services/session"
 import { addToReadingListAction } from "../../actions/readinglist"
+import { isBlogInReadingList } from "../../services/readinglist"
 
 const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params
@@ -14,7 +15,13 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   }
 
   const currentUser = await getCurrentUser()
-  const showReadingListButton = currentUser && blog.userId !== currentUser.id
+  
+  const isNotCreator = currentUser && blog.userId !== currentUser.id
+  const isAlreadyAdded = currentUser 
+    ? await isBlogInReadingList(currentUser.id, blog.id) 
+    : false
+
+  const showReadingListButton = isNotCreator && !isAlreadyAdded
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -50,6 +57,12 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
                 add to reading list
               </button>
             </form>
+          )}
+
+          {currentUser && isAlreadyAdded && (
+            <span className="text-sm text-gray-500 italic font-medium px-1">
+              In reading list
+            </span>
           )}
         </div>
 

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { getUserByUsername } from "../services/users"
 import { generateTokenAction } from "../actions/tokens"
 import { getReadingListByUserId } from "../services/readinglist"
+import { markAsReadAction } from "../actions/readinglist"
 
 export default async function MePage() {
   const session = await auth()
@@ -19,6 +20,9 @@ export default async function MePage() {
   }
 
   const listItems = await getReadingListByUserId(user.id)
+  
+  const unreadItems = listItems.filter(item => !item.read)
+  const readItems = listItems.filter(item => item.read)
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -38,36 +42,65 @@ export default async function MePage() {
 
         <h2 className="text-xl font-bold mb-4 text-slate-900">Reading List</h2>
         
-        {listItems.length === 0 ? (
-          <p className="text-gray-500 text-sm italic mb-6">Your reading list is empty.</p>
-        ) : (
-          <ul className="space-y-3 mb-6">
-            {listItems.map((item) => (
-              <li 
-                key={item.id} 
-                className="border rounded-lg p-4 shadow-sm bg-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-              >
-                <div>
+        <div className="mb-6">
+          <h3 className="text-md font-bold mb-3 text-slate-800">
+            Unread ({unreadItems.length})
+          </h3>
+          {unreadItems.length === 0 ? (
+            <p className="text-gray-500 text-sm italic mb-4">No unread blogs.</p>
+          ) : (
+            <ul className="space-y-2">
+              {unreadItems.map((item) => (
+                <li 
+                  key={item.id} 
+                  className="bg-yellow-50 border border-yellow-100 rounded p-4 flex items-center justify-between gap-4"
+                >
                   <Link 
                     href={`/blogs/${item.blog.id}`} 
-                    className="text-blue-600 hover:underline font-semibold block"
+                    className="text-blue-600 hover:underline font-medium text-sm block"
                   >
                     {item.blog.title}
                   </Link>
-                  <span className="text-sm text-gray-600">
-                    by <span className="font-medium text-gray-800">{item.blog.author}</span>
-                  </span>
-                </div>
-                
-                {item.read && (
-                  <span className="self-start sm:self-center bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
-                    ✓ Read
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+                  
+                  <form action={markAsReadAction}>
+                    <input type="hidden" name="itemId" value={item.id} />
+                    <button
+                      type="submit"
+                      className="bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded text-xs font-medium transition whitespace-nowrap"
+                    >
+                      mark as read
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="mb-6">
+          <h3 className="text-md font-bold mb-3 text-slate-800">
+            Read ({readItems.length})
+          </h3>
+          {readItems.length === 0 ? (
+            <p className="text-gray-500 text-sm italic mb-4">No read blogs.</p>
+          ) : (
+            <ul className="space-y-2">
+              {readItems.map((item) => (
+                <li 
+                  key={item.id} 
+                  className="bg-emerald-50/50 border border-emerald-100 rounded p-4 flex items-center justify-between"
+                >
+                  <Link 
+                    href={`/blogs/${item.blog.id}`} 
+                    className="text-blue-600 hover:underline font-medium text-sm block"
+                  >
+                    {item.blog.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         <hr className="border-slate-300 mb-6" />
 
