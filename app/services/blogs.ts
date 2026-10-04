@@ -17,7 +17,11 @@ export const addBlog = async (title: string, author: string, url: string, likes 
   if (!user) {
     throw new Error("No users found in the database to assign this note to.")
   }
-  await db.insert(blogs).values({ title, author, url, likes, userId: user.id })
+  const [insertedBlog] = await db
+    .insert(blogs)
+    .values({ title, author, url, likes, userId: user.id })
+    .returning()
+  return insertedBlog
 }
 
 export const getBlogById = async (id: number) => {
