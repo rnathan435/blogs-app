@@ -4,6 +4,8 @@ import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { addBlog, likeBlogById } from "../services/blogs"
 import { auth } from "@/auth";
+import { getCurrentUser } from "../services/session"
+import { addToReadingList } from "../services/readinglist"
 
 export type ActionState = {
   errors?: {
@@ -49,8 +51,17 @@ export const createBlog = async (prevState: ActionState, formData: FormData) => 
     }
   }
 
-  await addBlog(title.trim(), author.trim(), url.trim())
+  const currentUser = await getCurrentUser()
+  if (!currentUser) {
+    return { error: "User profile not found.", success: false }
+  }
+
+  const newBlog = await addBlog(title.trim(), author.trim(), url.trim())
   
+  if (newBlog && newBlog.id) {
+    await addToReadingList(currentUser.id, newBlog.id)
+  }
+
   revalidatePath("/blogs")
   return { error: "", success: true }
 }
