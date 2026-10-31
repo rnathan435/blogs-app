@@ -4,10 +4,12 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Link from "next/link"
+import { useNotification } from "../components/NotificationContext"
 
 export default function LoginPage() {
   const router = useRouter()
   const [error, setError] = useState("")
+  const { showNotification } = useNotification()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -22,6 +24,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError("Invalid username or password")
     } else {
+      showNotification("Logged in successfully")
       router.push("/")
       router.refresh()
     }
@@ -31,14 +34,15 @@ export default function LoginPage() {
     <div className="max-w-md mx-auto mt-10 p-6 bg-white border rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
       
-      {error && <p className="text-red-500 text-xs mb-4">{error}</p>}
+      {error && <p data-testid="error-message" className="text-red-500 text-xs mb-4">{error}</p>}
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
             Username
           </label>
           <input 
+            id="username"
             type="text" 
             name="username" 
             required 
@@ -47,10 +51,11 @@ export default function LoginPage() {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
             Password
           </label>
           <input 
+            id="password"
             type="password" 
             name="password" 
             required 
@@ -60,6 +65,7 @@ export default function LoginPage() {
         
         <button 
           type="submit"
+          data-testid="login-button"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition mt-2"
         >
           Login
