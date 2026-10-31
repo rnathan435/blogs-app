@@ -24,10 +24,11 @@ const NewBlog = () => {
       
       <form action={formAction} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="blog-title" className="block text-sm font-medium text-gray-700 mb-1">
             Title
           </label>
           <input 
+            id="blog-title"
             type="text" 
             name="title" 
             required 
@@ -41,10 +42,11 @@ const NewBlog = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="blog-author" className="block text-sm font-medium text-gray-700 mb-1">
             Author
           </label>
           <input 
+            id="blog-author"
             type="text" 
             name="author" 
             required 
@@ -58,10 +60,11 @@ const NewBlog = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Url
+          <label htmlFor="blog-url" className="block text-sm font-medium text-gray-700 mb-1">
+            URL
           </label>
           <input 
+            id="blog-url"
             type="url" 
             name="url" 
             required 
@@ -76,6 +79,7 @@ const NewBlog = () => {
 
         <button 
           type="submit"
+          data-testid="create-blog-button"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition"
         >
           Create

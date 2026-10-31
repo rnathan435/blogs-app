@@ -31,6 +31,7 @@ const Blogs = async ({
       {/* 2. Styled Clean Search Form using Flex layout */}
       <form action="/blogs" method="get" className="flex gap-2 mb-6">
         <input
+          data-testid="filter-input"
           type="text"
           name="filter"
           defaultValue={searchTerm}
@@ -40,6 +41,7 @@ const Blogs = async ({
         {showPopular && <input type="hidden" name="popular" value="true" />}
         <button 
           type="submit"
+          data-testid="search-button"
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition"
         >
           Search
@@ -47,7 +49,7 @@ const Blogs = async ({
       </form>
 
       {/* 3. Styled Layout Cards for Blogs */}
-      <ul className="space-y-3">
+      <ul data-testid="blogs-list" className="space-y-3">
         {blogs.length === 0 ? (
           <p className="text-gray-500 text-sm italic">No blogs match your filter criteria.</p>
         ) : (
